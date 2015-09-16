@@ -69,7 +69,42 @@ var BFS = function (problem) {
 	// Implemente a busca em largura com busca em grafo
 	// ...
 	// ...
+	var nodeQueue = new Queue();
+	var visitedSet = new Set();
+	var raiz = new Node(null, null, problem.initialState, 0, 0, 0);
 
+	// Adciona a raíz à lista de nós
+	nodeQueue.put(raiz);
+	visitedSet.add(raiz);
+	result.generated++;
+
+	while(!nodeQueue.empty()) {
+		var thisNode = nodeQueue.get();
+		result.expanded++;
+		if (!problem.GoalTest(thisNode.state)) {
+			// Recupera as ações aplicáveis ao estado do nó sendo verificado
+			var applicableActions = problem.Actions(thisNode.state);
+			for (var i = 0; i < applicableActions.length; i++) {
+				result.generated++;
+				var possibleState = problem.Result(thisNode.state, applicableActions[i]);
+				if(!visitedSet.hasElement(possibleState)) {
+					// Se o novo estado ainda não foi visitado,
+					// o adcionamos à lista de estados visitados
+					visitedSet.add(possibleState);
+					var newNode = new Node(applicableActions[i], 
+						                   thisNode, 
+						                   possibleState, 
+						                   thisNode.depth + 1, 
+						                   0, 0);
+					nodeQueue.put(newNode);
+				}
+			}
+		}
+		else {
+			// Recuperamos o vetor de ações a serem executadas
+			result.solution = thisNode.getPath();
+		}
+	}
 	return result; // retorna falha se não encontrou solução
 };
 
